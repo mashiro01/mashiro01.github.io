@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Mashiroの小站</title>
+  
+  
+  <link href="http://localhost:4000/atom.xml" rel="self"/>
+  
+  <link href="http://localhost:4000/"/>
+  <updated>2020-08-23T16:30:36.068Z</updated>
+  <id>http://localhost:4000/</id>
+  
+  <author>
+    <name>Mashiroi</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>初探内核模块</title>
+    <link href="http://localhost:4000/2020/08/24/%E5%86%85%E6%A0%B8%E5%88%9D%E6%8E%A2/"/>
+    <id>http://localhost:4000/2020/08/24/%E5%86%85%E6%A0%B8%E5%88%9D%E6%8E%A2/</id>
+    <published>2020-08-23T16:29:17.000Z</published>
+    <updated>2020-08-23T16:30:36.068Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>正好今天开始开始看《Linux内核设计与实现》这本书，就以Hello,world开个头吧</p><h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><pre class="line-numbers language-c" data-language="c"><code class="language-c">&#x2F;&#x2F; 模块所需头文件#include &lt;linux&#x2F;init.h&gt;#include &lt;linux&#x2F;module.h&gt;#include &lt;linux&#x2F;kernel.h&gt;#include &lt;linux&#x2F;moduleparam.h&gt;&#x2F;&#x2F; 许可证书MODULE_LICENSE(&quot;GPL&quot;);static int __init mod_init(void) &#123;    printk(KERN_ALERT &quot;Hello, World\n&quot;);    return 0;&#125;static void __exit mod_exit(void) &#123;    printk(KERN_ALERT &quot;Goodbye\n&quot;);&#125;module_init(mod_init);module_exit(mod_exit);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre><pre class="line-numbers language-makefile" data-language="makefile"><code class="language-makefile">obj-m :&#x3D; hello.oCURRENT_PATH :&#x3D; $(shell pwd)VERSION_NUM :&#x3D; $(shell uname -r)LINUX_PATH :&#x3D; &#x2F;usr&#x2F;src&#x2F;linux-headers-$(VERSION_NUM)all:make -C $(LINUX_PATH) M&#x3D;$(CURRENT_PATH) modulesclean:make -C $(LINUX_PATH) M&#x3D;$(CURRENT_PATH) clean<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre><p>这里可以看到的是内核模块的输出与标准输出有稍许不同的地方：</p><ul><li><code>printk</code>中<code>KERN_*</code>代表了优先级，与输出内容隔一个空格</li><li><code>printf</code>就是标准输出，只是调用系统函数输出字符串</li></ul><h2 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h2><p>直接make得到一大串文件</p><pre class="line-numbers language-text" data-language="text"><code class="language-text">.├── Makefile├── Module.symvers├── hello.c├── hello.ko├── hello.mod.c├── hello.mod.o├── hello.o└── modules.order<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre><blockquote><p>这里输出的.o文件并不能直接运行，为REL类型</p></blockquote><p><code>*.ko</code>即为我们所需的内核模块，<code>insmod $&#123;name&#125;.ko</code>将模块加载进内核</p><p>用dmesg查看输出</p><pre class="line-numbers language-text" data-language="text"><code class="language-text">[46478.783149] WSL2: Performing memory compaction.[46539.789768] WSL2: Performing memory compaction.[46660.796831] WSL2: Performing memory compaction.[46781.803469] WSL2: Performing memory compaction.[46902.810284] WSL2: Performing memory compaction.[46963.817192] WSL2: Performing memory compaction.[47007.007476] Hello, World<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre><p>然后<code>rmmod $(name)</code>退出该模块</p><pre class="line-numbers language-text" data-language="text"><code class="language-text">[53723.654584] WSL2: Performing memory compaction.[53784.665033] WSL2: Performing memory compaction.[53845.672471] WSL2: Performing memory compaction.[53906.679157] WSL2: Performing memory compaction.[54027.685937] WSL2: Performing memory compaction.[54054.799471] Goodbye<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;正好今天开始开始看《Linux内核设计与实现》这本书，就以Hello,world开个头吧&lt;/p&gt;
+&lt;h2 id=&quot;实现&quot;&gt;&lt;a href=&quot;</summary>
+      
+    
+    
+    
+    <category term="linux kernel" scheme="http://localhost:4000/categories/linux-kernel/"/>
+    
+    
+    <category term="kernel" scheme="http://localhost:4000/tags/kernel/"/>
+    
+    <category term="module" scheme="http://localhost:4000/tags/module/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>c/c++判断溢出</title>
+    <link href="http://localhost:4000/2020/08/23/c%E5%88%A4%E6%96%AD%E6%BA%A2%E5%87%BA/"/>
+    <id>http://localhost:4000/2020/08/23/c%E5%88%A4%E6%96%AD%E6%BA%A2%E5%87%BA/</id>
+    <published>2020-08-23T15:51:26.000Z</published>
+    <updated>2020-08-23T16:27:07.189Z</updated>
+    
+    <content type="html"><![CDATA[<pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">#include &lt;iostream&gt;using namespace std;int isAddOverflow(int a, int b) &#123;    int c &#x3D; 0;    __asm &#123;        mov eax, a        add eax, b        jo overflowed        xor eax, eax        jmp no_overflowed    overflowed:        mov eax, 1        mov c, eax    no_overflowed:    &#125;    return c;&#125;int main() &#123;    cout &lt;&lt; isAddOverflow(0x7fffffff, 1);    return 0;&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre><p>用汇编判读OF标志位是否变化即可得到</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;pre class=&quot;line-numbers language-cpp&quot; data-language=&quot;cpp&quot;&gt;&lt;code class=&quot;language-cpp&quot;&gt;#include &amp;lt;iostream&amp;gt;
+
+using namespace std;
+
+int i</summary>
+      
+    
+    
+    
+    <category term="c/c++" scheme="http://localhost:4000/categories/c-c/"/>
+    
+    
+    <category term="溢出判断" scheme="http://localhost:4000/tags/%E6%BA%A2%E5%87%BA%E5%88%A4%E6%96%AD/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="http://localhost:4000/2020/08/23/hello-world/"/>
+    <id>http://localhost:4000/2020/08/23/hello-world/</id>
+    <published>2020-08-23T15:32:04.288Z</published>
+    <updated>2020-08-23T15:32:04.288Z</updated>
+    
+    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo new &quot;My New Post&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo server<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo generate<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.io/docs/&quot;&gt;documentation&lt;/a&gt; for</summary>
+      
+    
+    
+    
+    
+  </entry>
+  
+</feed>
