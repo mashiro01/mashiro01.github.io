@@ -1,0 +1,200 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>深入理解计算机操作系统(二) -- 信息 · Mashiroの小站</title><meta name="description" content="现代计算机主要使用二进制来表示信息。当每一个二进制数字(位[bit])被组合起来后，再加上某种解释，就能够表示出任何有限集合的元素
+同时我们需要注意的是，能够用来表示位是有限的，且其在不同架构的计算机中是不同的，如果运算结果或者参与运算的元素超过了这一限制，运算就会发生溢出，产生某些神奇的错误
+信息"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="/images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style-dark.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"><link rel="stylesheet" href="/css/prism.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Typography</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">Sakamoto</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><li><a href="/categories">Categories</a></li><li><a href="/tags">Tags</a></li><li><a href="/categories/index.html">categories</a></li><li><a href="/leetcode/index.html">leetcode</a></li><li><a href="/tags/index.html">tags</a></li><li class="soc"><a href="https://github.com/mashiro01" target="_blank" rel="noopener noreferrer"><i class="fa fa-github">&nbsp;</i></a><a href="https://mashiro01.github.io/atom.xml" target="_blank" rel="noopener noreferrer"><i class="fa fa-rss">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2020&nbsp;<a target="_blank" href="https://mashiro01.github.io" rel="noopener noreferrer">Mashiroi</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post-container"><p class="post-title"><a>深入理解计算机操作系统(二) -- 信息</a></p><p class="post-meta"><span class="date meta-item">Posted at&nbsp;2020-08-24</span></p><p class="post-abstract"><p>现代计算机主要使用二进制来表示信息。当每一个二进制数字<code>(位[bit])</code>被组合起来后，再加上某种解释，就能够表示出<code>任何有限集合的元素</code></p>
+<p>同时我们需要注意的是，能够用来表示位是<strong>有限的</strong>，且其在不同架构的计算机中是不同的，如果运算结果或者参与运算的元素<strong>超过了这一限制</strong>，运算就会发生<code>溢出</code>，产生某些神奇的错误</p>
+<h2><span id="xin-xi-cun-chu">信息存储</span><a href="#xin-xi-cun-chu" class="header-anchor">#</a></h2><p>计算机存储的最小单位为比特(bit)，<strong>8bit</strong>组成一个<code>字节</code>(byte)，为最小的可寻址的内存单位</p>
+<p>对于程序来说，其会将内存视作<code>字节数组</code>，也就是<code>虚拟内存</code>，内存的每一个字节均会有一个对应的<code>地址</code></p>
+<blockquote>
+<p>对于c中的指针，其值均指向某个存储块的第一个字节的虚拟地址</p>
+</blockquote>
+<h3><span id="shi-liu-jin-zhi-biao-shi-fa">十六进制表示法</span><a href="#shi-liu-jin-zhi-biao-shi-fa" class="header-anchor">#</a></h3><p>对于字节来说，其由8个比特组成，用二进制表示的话太长了，用十进制表示的话转化转换不方便，而用十六进制的话恰好<strong>每四个字节</strong>能够划分为一组，表示十分方便</p>
+<p><img src="/images/csapp/chapter2/hex.png" alt="hex"></p>
+<p><img src="/images/csapp/chapter2/hexTrans.png" alt="hex"></p>
+<h3><span id="zi-shu-ju-da-xiao">字数据大小</span><a href="#zi-shu-ju-da-xiao" class="header-anchor">#</a></h3><p>对于不同架构的机器来说，其能访问的<code>虚拟地址空间</code>的长度也不同</p>
+<p>例如对于x86架构的机器来说，其能访问$1 - (2^{32} - 1)$范围的地址，为4GB，而对x64架构来说则能访问$1 - (2^{64} - 1)$范围，约为16EB大小的空间</p>
+<blockquote>
+<p>不同的字长是由于寄存器长度的不同而形成的，同时不同长度之间向下兼容</p>
+</blockquote>
+<p><img src="/images/csapp/chapter2/c_lang.png" alt="c"></p>
+<blockquote>
+<p>在编写程序时需要注意不同架构下的兼容性问题</p>
+</blockquote>
+<h3><span id="xun-zhi-yu-zi-jie-shun-xu">寻址与字节顺序</span><a href="#xun-zhi-yu-zi-jie-shun-xu" class="header-anchor">#</a></h3><p>对于一个复杂的应用程序来说，我们必须考虑如何在内存中存储这些对象</p>
+<blockquote>
+<p>对于一个w位的整数来说，其位表示为$[x_{w-1}, x_{w-2}, … , x_1, x_0]$，其中<code>最高有效字节</code>包括$[x_{w-1}, … , x_{w-8}]$，<code>最低有效字节</code>为$[x_7, … , x_1]$</p>
+</blockquote>
+<p>对于对象的排列来说有两种顺序</p>
+<ul>
+<li>最低有效字节在前，称为<code>小端法</code></li>
+<li>最高有效字节在前，称为<code>大端序</code></li>
+</ul>
+<p><img src="/images/csapp/chapter2/sequence.png" alt="seq"></p>
+<p>查看大小端可以用c语言来查看</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">#include &lt;stdio.h&gt;
+
+typedef unsigned char *byte_pointer;
+
+void show_bytes(byte_pointer start, size_t len) &#123;
+    for (size_t i &#x3D; 0; i &lt; len; i++) &#123;
+        printf(&quot;%.2x&quot;, start[i]);
+    &#125;
+    printf(&quot;\n&quot;);
+&#125;
+
+int main() &#123;
+    show_bytes(100, sizeof(int));
+    return 0;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3><span id="bu-er-dai-shu">布尔代数</span><a href="#bu-er-dai-shu" class="header-anchor">#</a></h3><p>布尔代数是为了研究<code>逻辑推理</code>的基本原则，将逻辑值<code>True</code>和<code>False</code>分别编码为<code>0</code>和<code>1</code></p>
+<p>同时布尔代数支持逻辑上的运算，即<code>非，异或，与，或</code></p>
+<p><img src="/images/csapp/chapter2/boolen.png" alt="bool"></p>
+<p>在将布尔代数拓展为<code>位向量</code>之后，这种运算依然成立</p>
+<blockquote>
+<p>型如$[a_{w-1}, … , a_0]$的编码集合称为是位向量</p>
+</blockquote>
+<h3><span id="wei-ji-yun-suan">位级运算</span><a href="#wei-ji-yun-suan" class="header-anchor">#</a></h3><blockquote>
+<p>和布尔运算一样吧</p>
+</blockquote>
+<h3><span id="luo-ji-yun-suan">逻辑运算</span><a href="#luo-ji-yun-suan" class="header-anchor">#</a></h3><p>与位级运算不同，这个逻辑运算是指<strong>整体逻辑上</strong>的成立与否，能够以True或False的形式进行输出</p>
+<p>一般提供了<code>||(or)</code>, <code>&amp;&amp;(and)</code>, 和<code>!(not)</code>三种逻辑运算方式</p>
+<p><img src="/images/csapp/chapter2/logic.png" alt="logic"></p>
+<h3><span id="yi-wei-yun-suan">移位运算</span><a href="#yi-wei-yun-suan" class="header-anchor">#</a></h3><p><code>移位</code>表示位向量中每个比特向某个方向整体移动n位，自动舍弃超出的位，并在不足的位置上自动<strong>补足</strong></p>
+<p>对于右移来说，其分为以下两种类型</p>
+<ul>
+<li>逻辑右移：向左端补齐0</li>
+<li>算术右移：在左端补齐最高有效位的值</li>
+</ul>
+<h2><span id="zheng-shu-biao-shi">整数表示</span><a href="#zheng-shu-biao-shi" class="header-anchor">#</a></h2><h3><span id="zheng-xing-shu-zi-lei-xing">整型数字类型</span><a href="#zheng-xing-shu-zi-lei-xing" class="header-anchor">#</a></h3><p>对于c来说，c中具有多种整型数据类型，每种关键字均能用关键字来指定大小</p>
+<p><img src="/images/csapp/chapter2/interger_m32_range.png" alt="m32"></p>
+<p><img src="/images/csapp/chapter2/interger_m64_range.png" alt="m64"></p>
+<blockquote>
+<p>可以看到正数和负数的取值范围是不同的，这与负数的表示方式相关</p>
+</blockquote>
+<h3><span id="zheng-xing-bian-ma">整型编码</span><a href="#zheng-xing-bian-ma" class="header-anchor">#</a></h3><h4><span id="wu-fu-hao-shu-zi-de-bian-ma">无符号数字的编码</span><a href="#wu-fu-hao-shu-zi-de-bian-ma" class="header-anchor">#</a></h4><p>对于一个整形数据来说，我们可以将其的每一位组合成一个位向量$\vec x$，且内部结构为$[x_{w-1}, … , x_0]$</p>
+<p>这样看来我们可以这样来定义无符号数(使用$B2U_w$函数来实现)</p>
+<script type="math/tex; mode=display">
+B2U_w(\vec{x}) = \sum_{i=0}^{w-1}x_i2^i</script><p>需要我们注意的是</p>
+<ul>
+<li>当我们指定一个数量是无符号类型时，那么其最高位的1或0，和其它位一样，用来表示该数的大小</li>
+</ul>
+<h4><span id="you-fu-hao-shu-zi-de-bian-ma">有符号数字的编码</span><a href="#you-fu-hao-shu-zi-de-bian-ma" class="header-anchor">#</a></h4><p>与无符号数字相似，其也是通过位的运算所得出的结果，但是最高位不再指定数字的大小，而是表示符号</p>
+<p>这种表示方式称为是<code>补码</code></p>
+<script type="math/tex; mode=display">
+B2U_w(\vec{x}) = -x_{w-1} + \sum_{i=0}^{w-2}x_i2^i</script><h3><span id="zheng-xing-biao-shi-de-te-dian">整形表示的特点</span><a href="#zheng-xing-biao-shi-de-te-dian" class="header-anchor">#</a></h3><p>对于<code>WORD</code>类型的数字来说</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">Decimal</th>
+<th style="text-align:center">Hex</th>
+<th style="text-align:center">Binary</th>
+<th style="text-align:center"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">UMax</td>
+<td style="text-align:center">65535</td>
+<td style="text-align:center">FF FF</td>
+<td style="text-align:center">1111 1111 1111 1111</td>
+<td style="text-align:center">2^16 - 1</td>
+</tr>
+<tr>
+<td style="text-align:center">TMax</td>
+<td style="text-align:center">32767</td>
+<td style="text-align:center">7F FF</td>
+<td style="text-align:center">0111 1111 1111 1111</td>
+<td style="text-align:center">2^15 - 1</td>
+</tr>
+<tr>
+<td style="text-align:center">TMin</td>
+<td style="text-align:center">-32768</td>
+<td style="text-align:center">80 00</td>
+<td style="text-align:center">1000 0000 0000 0000</td>
+<td style="text-align:center">-2^15</td>
+</tr>
+<tr>
+<td style="text-align:center">-1</td>
+<td style="text-align:center">-1</td>
+<td style="text-align:center">FF FF</td>
+<td style="text-align:center">1111 1111 1111 1111</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">00 00</td>
+<td style="text-align:center">0000 0000 0000 0000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>拓展到任意长度的均可这样表示</p>
+<p>可以得到</p>
+<ul>
+<li>$|T_{min}|=T_{max}+1$</li>
+<li>$|U_{max}|=2*T_{max}+1$</li>
+</ul>
+<p>有符号数和无符号数在非负数的编码是一样的，每一个数字的编码是唯一的，这两者可以互换</p>
+<ul>
+<li>$U2B(x)=B2U−1(x)$</li>
+<li>$T2B(x)=B2T−1(x)$</li>
+</ul>
+<h3><span id="lei-xing-zhuan-huan">类型转换</span><a href="#lei-xing-zhuan-huan" class="header-anchor">#</a></h3><p><img src="https://wdxtub.com/images/14609257940557.jpg" alt="link"></p>
+<p>当我们在有符号和无符号类型之间进行转换时</p>
+<ul>
+<li>位值不变，只是改变了解释这些位的方式</li>
+<li>如果一个表达式既包含有符号数也包含无符号数，那么会被隐式转换成无符号数进行比较</li>
+</ul>
+<p>其余情况下按着这个数轴进行一一对应</p>
+<p><img src="/images/csapp/chapter2/trans.png" alt="trans"></p>
+<blockquote>
+<p>在编写c语言程序时务必要注意数字类型的比较</p>
+<p>不只是整型之间的转换，c中整型向size_t, char等的类型进行转换时也要注意符号带来的影响</p>
+</blockquote>
+<h3><span id="zeng-yu-jian">增与减</span><a href="#zeng-yu-jian" class="header-anchor">#</a></h3><p>增与减都代表了程序自身理解内存方式的变化</p>
+<h4><span id="tuo-zhan-shu-zi-de-wei-biao-shi">拓展数字的位表示</span><a href="#tuo-zhan-shu-zi-de-wei-biao-shi" class="header-anchor">#</a></h4><ul>
+<li>无符号数字只要向表示的开头加<code>0</code>即可</li>
+<li>有符号数字需要向表示的开头加<code>1</code></li>
+</ul>
+<h4><span id="jie-qu-shu-zi">截取数字</span><a href="#jie-qu-shu-zi" class="header-anchor">#</a></h4><ul>
+<li>对于无符号数字，丢弃相应位数，相当于 $x mod 2^k$</li>
+<li>对于有符号数字，丢弃相应位数，最高位作为符号位继续表示</li>
+</ul>
+<h3><span id="zheng-xing-yun-suan">整型运算</span><a href="#zheng-xing-yun-suan" class="header-anchor">#</a></h3><h4><span id="yi-chu">溢出</span><a href="#yi-chu" class="header-anchor">#</a></h4><p>数值的范围可以看作是一个首尾相接的圆，超出了返回就会向相接的部分发生变化</p>
+<ul>
+<li>从最大正数部分溢出到负数称为是<code>正溢</code></li>
+<li>从最小负数部分溢出到正数称为是<code>负溢</code></li>
+</ul>
+<h4><span id="yun-suan">运算</span><a href="#yun-suan" class="header-anchor">#</a></h4><blockquote>
+<p>公式部分就不想写了，感觉看了也没啥用。。。</p>
+</blockquote>
+<p>整数运算就是<strong>位的运算</strong>，也是一种<strong>模运算形式</strong></p>
+<p>特别是乘法与除法，在不涉及浮点数时，其本质在O1优化下可以很容易地看出是<code>加法与减法的结合体</code></p>
+<h2><span id="fu-dian-shu">浮点数</span><a href="#fu-dian-shu" class="header-anchor">#</a></h2><p>浮点数的出现补足了计算机数值运算的<code>&quot;空缺&quot;</code>，能表示出接近0的数字，也能表示出非常大的数字，这些都是浮点数的特殊结构所带来的特别之处</p>
+<blockquote>
+<p>需要注意的是，浮点数的特殊结构决定了其只能是<code>近似结果</code></p>
+</blockquote>
+<h3><span id="fu-dian-shu-de-biao-shi">浮点数的表示</span><a href="#fu-dian-shu-de-biao-shi" class="header-anchor">#</a></h3><h4><span id="ding-dian-biao-shi-fa">定点表示法</span><a href="#ding-dian-biao-shi-fa" class="header-anchor">#</a></h4><p>作为特殊的一类数字，我们仍能使用整数的表示方法来对浮点数进行编码</p>
+<p>以点为界，左为整数的表示法，从右开始每位的权由<code>-1</code>依次减一，这就表示出了一个简单的浮点数</p>
+<script type="math/tex; mode=display">d = \sum_{i=-n}^{m}10^{i} * d_{i}</script><p><img src="/images/csapp/chapter2/simpleFloat.png" alt="simpleFloat"></p>
+<p>同时很明显的是，这样只能表示出形如$x * 2^y$的数字，对于0.20之类的小数并不能准确表示</p>
+<h4><span id="ieee-754">IEEE 754</span><a href="#ieee-754" class="header-anchor">#</a></h4><p><code>IEEE 754</code>标准用$V=(-1)^s<em>M</em>2^e$来表示一个数字</p>
+<ul>
+<li><code>符号s</code>，决定了最后的符号</li>
+<li><code>尾数</code>，M是一个二进制小数，范围是</li>
+<li><code>阶码</code>，对浮点数加权</li>
+</ul>
+<p><img src="/images/csapp/chapter2/IEEEE.png" alt="IEEE"></p>
+<p>同时根据给出的exp的值，被编码的值可以分为三种不同的情况</p>
+<p><img src="/images/csapp/chapter2/exp.png" alt="exp"></p>
+<blockquote>
+<p>所以说0.1+0.2为啥不等于0.3就是这个原因</p>
+</blockquote>
+<h2><span id="reference">Reference</span><a href="#reference" class="header-anchor">#</a></h2><p><a target="_blank" rel="noopener" href="https://wdxtub.com/csapp/thin-csapp-1/2016/04/16/">【读薄 CSAPP】壹 数据表示</a></p>
+<hr>
+<h2><span id="dui-ying-lab">对应Lab</span><a href="#dui-ying-lab" class="header-anchor">#</a></h2><ul>
+<li>[ ] datalab</li>
+</ul>
+</p></div><div class="share"><span>Share</span>&nbsp;<span class="soc"><a href="javascript:(function(){EN_CLIP_HOST='http://www.evernote.com';try{var%20x=document.createElement('SCRIPT');x.type='text/javascript';x.src=EN_CLIP_HOST+'/public/bookmarkClipper.js?'+(new%20Date().getTime()/100000);document.getElementsByTagName('head')[0].appendChild(x);}catch(e){location.href=EN_CLIP_HOST+'/clip.action?url='+encodeURIComponent(location.href)+'&amp;title='+encodeURIComponent(document.title);}})();" ref="nofollow" target="_blank" class="fa fa-bookmark"></a></span><span class="soc"><a href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));" class="fa fa-weibo"></a></span><span class="soc"><a target="_blank" rel="noopener" href="http://twitter.com/home?status=https://mashiro01.github.io/2020/08/24/深入理解计算机操作系统-二/%20Mashiroの小站%20深入理解计算机操作系统(二) -- 信息" class="fa fa-twitter"></a></span></div><div class="pagination"><p class="clearfix"><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/2020/08/24/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E4%B8%80/" title="深入理解计算机操作系统(一) -- 计算机系统">Next post: 深入理解计算机操作系统(一) -- 计算机系统&nbsp;<i class="fa fa-angle-double-right"></i></a></span></p></div></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2020&nbsp;<a target="_blank" href="https://mashiro01.github.io" rel="noopener noreferrer">Mashiroi</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>

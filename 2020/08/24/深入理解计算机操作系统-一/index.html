@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>深入理解计算机操作系统(一) -- 计算机系统 · Mashiroの小站</title><meta name="description" content="这里先给出一段c的代码
+#include &amp;lt;stdio.h&amp;gt;
+
+int main() &amp;#123;
+    printf(&amp;quot;Hello,World!&amp;quot;);
+    return 0;
+&amp;#125;
+可以看出这就是一段普通的字符，并没有什么特别之处，那么这又是怎么编译成"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="/images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style-dark.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"><link rel="stylesheet" href="/css/prism.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Typography</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">Sakamoto</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><li><a href="/categories">Categories</a></li><li><a href="/tags">Tags</a></li><li><a href="/categories/index.html">categories</a></li><li><a href="/leetcode/index.html">leetcode</a></li><li><a href="/tags/index.html">tags</a></li><li class="soc"><a href="https://github.com/mashiro01" target="_blank" rel="noopener noreferrer"><i class="fa fa-github">&nbsp;</i></a><a href="https://mashiro01.github.io/atom.xml" target="_blank" rel="noopener noreferrer"><i class="fa fa-rss">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2020&nbsp;<a target="_blank" href="https://mashiro01.github.io" rel="noopener noreferrer">Mashiroi</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post-container"><p class="post-title"><a>深入理解计算机操作系统(一) -- 计算机系统</a></p><p class="post-meta"><span class="date meta-item">Posted at&nbsp;2020-08-24</span></p><p class="post-abstract"><p>这里先给出一段c的代码</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() &#123;
+    printf(&quot;Hello,World!&quot;);
+    return 0;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看出这就是一段普通的字符，并没有什么特别之处，那么这又是怎么编译成能够被运行的程序呢?</p>
+<h2><span id="cheng-xu-bei-fan-yi-cheng-qi-ta-de-ge-shi">程序被翻译成其他的格式</span><a href="#cheng-xu-bei-fan-yi-cheng-qi-ta-de-ge-shi" class="header-anchor">#</a></h2><p>对于高级程序语言来说，其能够被<code>编译器</code>转化为一系列<code>低级机器语言</code>指令，并且之后被按照一种<code>可执行目标程序</code>打包为<code>二进制文件</code>，这样就完成了程序的编译</p>
+<p><img src="/images/csapp/chapter1/sys.png" alt="sys"></p>
+<ul>
+<li><p>预处理阶段<br>预处理器将引用的库文件进行<code>展开</code>，并对原c程序进行修改，得到完整的源程序</p>
+</li>
+<li><p>编译阶段<br>编译器将<code>.i</code>文件翻译为低级机器语言，得到一个包含<code>汇编语言程序</code>的文本文件</p>
+</li>
+<li><p>汇编阶段<br>汇编器将汇编语言程序翻译为机器语言，并打包在一个后缀为<code>.o</code>的二进制文件中</p>
+</li>
+<li><p>链接阶段<br>链接器将其他外部引用的函数所编译成的.o文件与前一步编译好的文件结合起来，形成<code>可执行目标文件</code></p>
+</li>
+</ul>
+<blockquote>
+<p>可以通过gcc来编译并查看这些中间文件</p>
+</blockquote>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">gcc hello.c -save-items -m32 -o hello<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h2><span id="cheng-xu-zai-xi-tong-zhong-de-yun-xing">程序在系统中的运行</span><a href="#cheng-xu-zai-xi-tong-zhong-de-yun-xing" class="header-anchor">#</a></h2><h3><span id="xi-tong-de-ying-jian-zu-cheng">系统的硬件组成</span><a href="#xi-tong-de-ying-jian-zu-cheng" class="header-anchor">#</a></h3><p><img src="/images/csapp/chapter1/bus.png" alt="bus"></p>
+<ol>
+<li><p>总线<br>总线是系统中携带信息字节并在各个部件间传递的设备</p>
+</li>
+<li><p>I/O设备<br>I/O设备是系统与外界世界的联系通道，且每一个I/O设备均通过一个<code>控制器</code>或<code>适配器</code>与I/O总线相连</p>
+</li>
+<li><p>主存<br>主存是临时存储设备，能够存储程序运行期间处理的数据和程序本体</p>
+</li>
+<li><p>处理器<br>CPU能够不断地处理来自主存中的指令，在任何时刻其中的<code>程序计数器</code>均指向某条机器语言指令</p>
+</li>
+</ol>
+<h3><span id="cheng-xu-de-yun-xing-guo-cheng">程序的运行过程</span><a href="#cheng-xu-de-yun-xing-guo-cheng" class="header-anchor">#</a></h3><p>首先当我们从键盘等I/O设备输入命令时，shell会先把字符逐一读入寄存器，再将其放到内存中</p>
+<p><img src="/images/csapp/chapter1/read.png" alt="read"></p>
+<p>之后在完成输入后，shell会从磁盘中加载我们所输入的文件到主存中</p>
+<p><img src="/images/csapp/chapter1/load.png" alt="load"></p>
+<p>在完成加载到主存中后，程序就能够执行并进行输出了</p>
+<p><img src="/images/csapp/chapter1/run.png" alt="run"></p>
+<h2><span id="cao-zuo-xi-tong-yu-ying-jian">操作系统与硬件</span><a href="#cao-zuo-xi-tong-yu-ying-jian" class="header-anchor">#</a></h2><h3><span id="gao-su-huan-cun">高速缓存</span><a href="#gao-su-huan-cun" class="header-anchor">#</a></h3><p>不同I/O设备间的速度是不同的，同时与系统内部硬件的速度更是有很大的区别</p>
+<p>为了使不同速度的硬件能够互相协调，我们引入了<code>高速缓存</code>这个结构，同时每个计算机系统中的存储设备均被组织成了一个存储器层次结构</p>
+<p><img src="/images/csapp/chapter1/storageLevel.png" alt="storage"></p>
+<h3><span id="cao-zuo-xi-tong-guan-li-ying-jian">操作系统管理硬件</span><a href="#cao-zuo-xi-tong-guan-li-ying-jian" class="header-anchor">#</a></h3><p>操作系统位于<code>硬件和应用程序之间</code>，是用户通过应用程序操作硬件的一种<code>接口</code>，同时能够协调两边的活动</p>
+<p><img src="/images/csapp/chapter1/operatingSystem.png" alt="system"></p>
+<p>操作系统主要有以下两种作用</p>
+<ol>
+<li>防止硬件被失控的应用程序滥用</li>
+<li>向应用程序提供一种机制来控制复杂而大不相同的低级硬件设施</li>
+</ol>
+<h4><span id="jin-cheng">进程</span><a href="#jin-cheng" class="header-anchor">#</a></h4><p><code>进程</code>是操作系统对正在运行程序的一种<code>抽象</code>。在一个操作系统上能够同时运行多个进程</p>
+<p>对于单核处理器来说，不同进程间的指令是交错执行的，这个称为是<code>并发运行</code>，同时这种交错执行的机制称为是<code>上下文切换</code></p>
+<p><img src="/images/csapp/chapter1/change.png" alt="exchange"></p>
+<p>可以看出上下文切换是在<code>内核态</code>的时候所发生的，操作系统能够保存前一进程的状态，并待另一进程运行完成后恢复前一进程的数据</p>
+<p>同时进程能够通过<code>系统调用</code>(system call)来调用操作系统内的操作</p>
+<h4><span id="xian-cheng">线程</span><a href="#xian-cheng" class="header-anchor">#</a></h4><p>一个进程能够由多个称为<code>线程</code>的执行单元组成，同时线程之间能够共享数据</p>
+<h4><span id="xu-ni-nei-cun">虚拟内存</span><a href="#xu-ni-nei-cun" class="header-anchor">#</a></h4><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/yaoxiaowen/p/7805964.html">https://www.cnblogs.com/yaoxiaowen/p/7805964.html</a></p>
+<h4><span id="wen-jian">文件</span><a href="#wen-jian" class="header-anchor">#</a></h4><p>文件就是一种<code>字节序列</code>，任何<strong>一种I/O设备均可以被看作是一种文件</strong>，同时输入输出即可通过调用这些文件来实现</p>
+<h4><span id="wang-luo">网络</span><a href="#wang-luo" class="header-anchor">#</a></h4><p><img src="/images/csapp/chapter1/netAdapter.png" alt="net"></p>
+<p>网络适配器也是一种I/O设备，通过交互能够将网络通信内容<strong>加载到主存</strong>当中</p>
+<h2><span id="cheng-xu-kuai-su-yun-xing-de-ji-chu">程序快速运行的基础</span><a href="#cheng-xu-kuai-su-yun-xing-de-ji-chu" class="header-anchor">#</a></h2><p>这里我们先要区分开并发和并行的含义</p>
+<ul>
+<li>并发：指可以同时具有多个活动的系统</li>
+<li>并行：指使用并发使系统运行地更快</li>
+</ul>
+<h3><span id="xian-cheng-ji-bing-fa">线程级并发</span><a href="#xian-cheng-ji-bing-fa" class="header-anchor">#</a></h3><p>并发的实质是<strong>一个物理CPU</strong>(也可以多个物理CPU)在若干道程序之间<code>多路复用</code>，并发是对有限物理资源强制行使多用户共享以提高效率。</p>
+<blockquote>
+<p>并发当有多个线程在操作时,如果系统只有一个CPU,则它根本不可能真正同时进行一个以上的线程，它只能把CPU运行时间划分成若干个时间段,再将时间段分配给各个线程执行，在一个时间段的线程代码运行时，其它线程处于挂起状</p>
+</blockquote>
+<h3><span id="zhi-ling-ji-bing-xing">指令级并行</span><a href="#zhi-ling-ji-bing-xing" class="header-anchor">#</a></h3><p><code>并行</code>指两个或两个以上事件或活动在<strong>同一时刻发生</strong>。在多道程序环境下，并行性使多个程序同一时刻可在<strong>不同</strong>CPU上<strong>同时</strong>执行</p>
+<blockquote>
+<p>当系统有一个以上CPU时,则线程的操作有可能非并发。当一个CPU执行一个线程时，另一个CPU可以执行另一个线程，两个线程互不抢占CPU资源，可以同时进行，这种方式我们称之为并行</p>
+</blockquote>
+<h3><span id="chuan-xing">串行</span><a href="#chuan-xing" class="header-anchor">#</a></h3><p>除了并行之外，我们还有<code>串行</code>这种任务的执行方式</p>
+<p>串行是指多个任务时，各个任务按<strong>顺序执行</strong>，完成一个之后才能进行下一个</p>
+<h3><span id="tong-bu-he-yi-bu">同步和异步</span><a href="#tong-bu-he-yi-bu" class="header-anchor">#</a></h3><p>指的是能否开启<code>新的线程</code>。同步不能开启新的线程，异步可以。异步和同步是相对的</p>
+<ul>
+<li><code>同步</code>就是<strong>顺序执行</strong>，执行完一个再执行下一个，需要等待、协调运行</li>
+<li><code>异步</code>就是彼此独立, 在等待某事件的过程中继续做自己的事，<strong>不需要等待</strong>这一事件完成后再工作，减小IO阻塞对程序运行速度的减慢</li>
+</ul>
+<h3><span id="xiao-jie">小结</span><a href="#xiao-jie" class="header-anchor">#</a></h3><p><strong>线程就是实现异步的一个方式</strong></p>
+<p>异步是让调用方法的主线程不需要同步等待另一线程的完成，从而可以让主线程干其它的事情。异步和多线程并不是一个同等关系, 异步是<code>最终目的</code>, 多线程只是我们<strong>实现异步的一种手段</strong></p>
+<p>异步是当一个调用请求发送给被调用者, 而调用者不用等待其结果的返回而可以做其它的事情。实现异步可以采用多线程技术或者交给另外的进程来处理</p>
+<h2><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h2><ul>
+<li><a target="_blank" rel="noopener" href="https://juejin.im/post/6844904159292948487">并发，并行，串行，同步，异步？</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/yaoxiaowen/p/7805661.html">什么是内存（一）：存储器层次结构</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/yaoxiaowen/p/7805964.html">什么是内存(二)：虚拟内存</a></li>
+</ul>
+</p></div><div class="share"><span>Share</span>&nbsp;<span class="soc"><a href="javascript:(function(){EN_CLIP_HOST='http://www.evernote.com';try{var%20x=document.createElement('SCRIPT');x.type='text/javascript';x.src=EN_CLIP_HOST+'/public/bookmarkClipper.js?'+(new%20Date().getTime()/100000);document.getElementsByTagName('head')[0].appendChild(x);}catch(e){location.href=EN_CLIP_HOST+'/clip.action?url='+encodeURIComponent(location.href)+'&amp;title='+encodeURIComponent(document.title);}})();" ref="nofollow" target="_blank" class="fa fa-bookmark"></a></span><span class="soc"><a href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));" class="fa fa-weibo"></a></span><span class="soc"><a target="_blank" rel="noopener" href="http://twitter.com/home?status=https://mashiro01.github.io/2020/08/24/深入理解计算机操作系统-一/%20Mashiroの小站%20深入理解计算机操作系统(一) -- 计算机系统" class="fa fa-twitter"></a></span></div><div class="pagination"><p class="clearfix"><span class="pre pagbuttons"><a role="navigation" href="/2020/08/24/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E4%BA%8C/" title="深入理解计算机操作系统(二) -- 信息"><i class="fa fa-angle-double-left"></i>&nbsp;Previous post: 深入理解计算机操作系统(二) -- 信息</a></span><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/2020/08/24/Internet%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84/" title="Internet地址结构">Next post: Internet地址结构&nbsp;<i class="fa fa-angle-double-right"></i></a></span></p></div></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2020&nbsp;<a target="_blank" href="https://mashiro01.github.io" rel="noopener noreferrer">Mashiroi</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>

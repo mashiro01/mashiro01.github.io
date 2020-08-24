@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>计算机网络 -- 应用层 · Mashiroの小站</title><meta name="description" content="网络应用是计算机网络存在的理由，如果我们不能构想出任何有用的应用，也就没有任何必要去设计支持它们的网络协议了。
+
+应用层协议原理#1.1 应用层协议#应用层协议定义了运行在不同端系统上的应用程序如何相互交换报文
+
+每个应用层协议都是为了解决某一类应用问题，而问题的解决又往往是通过位于不同主机中的多个"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="/images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style-dark.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"><link rel="stylesheet" href="/css/prism.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Typography</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">Sakamoto</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><li><a href="/categories">Categories</a></li><li><a href="/tags">Tags</a></li><li><a href="/categories/index.html">categories</a></li><li><a href="/leetcode/index.html">leetcode</a></li><li><a href="/tags/index.html">tags</a></li><li class="soc"><a href="https://github.com/mashiro01" target="_blank" rel="noopener noreferrer"><i class="fa fa-github">&nbsp;</i></a><a href="https://mashiro01.github.io/atom.xml" target="_blank" rel="noopener noreferrer"><i class="fa fa-rss">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2020&nbsp;<a target="_blank" href="https://mashiro01.github.io" rel="noopener noreferrer">Mashiroi</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post-container"><p class="post-title"><a>计算机网络 -- 应用层</a></p><p class="post-meta"><span class="date meta-item">Posted at&nbsp;2020-08-24</span></p><p class="post-abstract"><blockquote>
+<p>网络应用是计算机网络存在的理由，如果我们不能构想出任何有用的应用，也就没有任何必要去设计支持它们的网络协议了。</p>
+</blockquote>
+<h2><span id="ying-yong-ceng-xie-yi-yuan-li">应用层协议原理</span><a href="#ying-yong-ceng-xie-yi-yuan-li" class="header-anchor">#</a></h2><h3><span id="1-1-ying-yong-ceng-xie-yi">1.1 应用层协议</span><a href="#1-1-ying-yong-ceng-xie-yi" class="header-anchor">#</a></h3><p>应用层协议定义了运行在不同端系统上的应用程序如何相互交换报文</p>
+<ul>
+<li><p>每个应用层协议都是为了解决某一类应用问题，而问题的解决又往往是通过位于不同主机中的多个应用进程之间的通信和协同工作来完成的。应用层的具体内容就是规定应用进程在通信时所遵循的协议</p>
+</li>
+<li><p>应用层的许多协议都是基于客户服务器方式</p>
+</li>
+</ul>
+<p>同时特别的，应用层协议也定义了：</p>
+<ul>
+<li>交换的报文类型</li>
+<li>各种报文类型的语法</li>
+<li>字段的语义</li>
+<li>确定一个进程何时以及如何发送报文，对报文进行相应的规则</li>
+</ul>
+<h3><span id="1-2-ying-yong-cheng-xu-ti-xi-jie-gou">1.2 应用程序体系结构</span><a href="#1-2-ying-yong-cheng-xu-ti-xi-jie-gou" class="header-anchor">#</a></h3><p>在对信息进行网络编码前，我们需要指定一份应用程序体系结构，来规定如何在端系统上组织该应用程序，这里介绍两种主流的结构：</p>
+<ol>
+<li><p>客户-服务器体系结构（CS）</p>
+<ul>
+<li>总有一台打开的主机，接受来自各方的请求，并将结果返回个用户</li>
+<li>服务器的集合叫做数据中心</li>
+</ul>
+</li>
+<li><p>P2P体系结构</p>
+<ul>
+<li>应用程序在间断连接的主机之间直接通信（对等方）</li>
+<li>对中心服务器有最小的依赖</li>
+<li>服务器一般用于追踪用户的ip地址，但报文在主机之间直接发送</li>
+</ul>
+</li>
+</ol>
+<h3><span id="1-3-jin-cheng-tong-xin">1.3 进程通信</span><a href="#1-3-jin-cheng-tong-xin" class="header-anchor">#</a></h3><ol>
+<li><p>对于操作系统来说，进行通讯的并不是程序本身，而是<code>进程</code>，同时进程间交换的信息叫做<code>报文</code></p>
+</li>
+<li><p>对于网络应用程序来说，发起通信的一端叫做客户端，与之对应的另外一端称为服务端</p>
+</li>
+<li><p>进程通过一个称为<strong>套接字</strong>的软件接口来发送报文，其为应用层与运输层之间的接口，又称为<code>API</code></p>
+</li>
+<li><p>要向特定的地址发送信息，我们需要目的地的地址，这个一般使用<strong>IP</strong>进行标识。同时不同的应用有其自己所有的端口，来用于进行标识需要接收的内容</p>
+</li>
+</ol>
+<h3><span id="1-4-bao-wen-chuan-shu">1.4 报文传输</span><a href="#1-4-bao-wen-chuan-shu" class="header-anchor">#</a></h3><p>为了得到合适于报文传输的运输层协议，我们需要从以下几点进行考虑</p>
+<ol>
+<li>可靠数据传输（确定信息容忍丢失的范围）</li>
+<li>吞吐量（网络带宽的限制）</li>
+<li>定时（信息传输需要的时间）</li>
+<li>安全性</li>
+</ol>
+<p>这里先介绍两种常用的运输层协议：</p>
+<ol>
+<li><p>TCP (Transmission Control Protocol)</p>
+<ul>
+<li>面向连接的服务</li>
+<li>可靠的数据传输服务</li>
+<li>具有拥堵控制机制</li>
+</ul>
+</li>
+<li><p>UDP (User Datagram Protocol)</p>
+<ul>
+<li>不可靠的数据传输服务</li>
+<li>能以任意速率进行传输</li>
+</ul>
+</li>
+</ol>
+<p>因此在实际的运用过程中，我们要根据实际需求，来选择合适的传输方案</p>
+</p></div><div class="share"><span>Share</span>&nbsp;<span class="soc"><a href="javascript:(function(){EN_CLIP_HOST='http://www.evernote.com';try{var%20x=document.createElement('SCRIPT');x.type='text/javascript';x.src=EN_CLIP_HOST+'/public/bookmarkClipper.js?'+(new%20Date().getTime()/100000);document.getElementsByTagName('head')[0].appendChild(x);}catch(e){location.href=EN_CLIP_HOST+'/clip.action?url='+encodeURIComponent(location.href)+'&amp;title='+encodeURIComponent(document.title);}})();" ref="nofollow" target="_blank" class="fa fa-bookmark"></a></span><span class="soc"><a href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));" class="fa fa-weibo"></a></span><span class="soc"><a target="_blank" rel="noopener" href="http://twitter.com/home?status=https://mashiro01.github.io/2020/08/24/应用层/%20Mashiroの小站%20计算机网络 -- 应用层" class="fa fa-twitter"></a></span></div><div class="pagination"><p class="clearfix"><span class="pre pagbuttons"><a role="navigation" href="/2020/08/24/Internet%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84/" title="Internet地址结构"><i class="fa fa-angle-double-left"></i>&nbsp;Previous post: Internet地址结构</a></span><span>&nbsp;</span><span class="next pagbuttons"><a role="navigation" href="/2020/08/24/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E4%BC%A0%E8%BE%93%E5%B1%82/" title="计算机网络 -- 传输层">Next post: 计算机网络 -- 传输层&nbsp;<i class="fa fa-angle-double-right"></i></a></span></p></div></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2020&nbsp;<a target="_blank" href="https://mashiro01.github.io" rel="noopener noreferrer">Mashiroi</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>
