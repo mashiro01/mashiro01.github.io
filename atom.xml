@@ -6,7 +6,7 @@
   <link href="http://localhost:4000/atom.xml" rel="self"/>
   
   <link href="http://localhost:4000/"/>
-  <updated>2020-08-23T16:30:36.068Z</updated>
+  <updated>2020-08-24T00:03:13.919Z</updated>
   <id>http://localhost:4000/</id>
   
   <author>
@@ -15,6 +15,30 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>wsl2下内核头文件</title>
+    <link href="http://localhost:4000/2020/08/24/wsl2%E4%B8%8B%E5%86%85%E6%A0%B8%E5%A4%B4%E6%96%87%E4%BB%B6/"/>
+    <id>http://localhost:4000/2020/08/24/wsl2%E4%B8%8B%E5%86%85%E6%A0%B8%E5%A4%B4%E6%96%87%E4%BB%B6/</id>
+    <published>2020-08-24T00:01:08.000Z</published>
+    <updated>2020-08-24T00:03:13.919Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本来正常的linux发行版只要安装<code>linux-headers-$(uname -r)</code>就能装上内核头文件，但wsl2作为一个不一般的linux发行版，并没有直接给出安装包，要手动安装才能正常使用</p><h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><p>先去github上找到对应版本的内核源码，我这里使用的是<code>4.19.121-microsoft-standard</code></p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">(base)  ⚡ root@404-NOT-FOUND  ~&#x2F;forExtract&#x2F;kernel  uname -r4.19.121-microsoft-standard<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre><p>那我就应该下载这个版本: <a href="https://github.com/microsoft/WSL2-Linux-Kernel/releases/tag/4.19.121-microsoft-standard">https://github.com/microsoft/WSL2-Linux-Kernel/releases/tag/4.19.121-microsoft-standard</a></p><ul><li><p>安装依赖</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">apt install libelf-dev build-essential pkg-configapt install bison build-essential flex libssl-dev libelf-dev bc<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></li><li><p>编译</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">tar -zvxf 4.19.121-microsoft-standard.tar.gzcd WSL2-Linux-Kernel-4.19.121-microsoft-standard.tar.gzzcat &#x2F;proc&#x2F;config.gz &gt; .configmake -j $(nproc)               &#x2F;&#x2F;Compile the kernel and modulesmake -j $(nproc) modules_install<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></li></ul><p>编译完成后创建软链接即可</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">ln ~&#x2F;kernel&#x2F;WSL2-Linux-Kernel-4.19.121-microsoft-standard &#x2F;usr&#x2F;src&#x2F;linux-headers-4.19.121-microsoft-standard&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;本来正常的linux发行版只要安装&lt;code&gt;linux-headers-$(uname -r)&lt;/code&gt;就能装上内核头文件，但wsl2</summary>
+      
+    
+    
+    
+    <category term="wsl2调教" scheme="http://localhost:4000/categories/wsl2%E8%B0%83%E6%95%99/"/>
+    
+    
+    <category term="kernel" scheme="http://localhost:4000/tags/kernel/"/>
+    
+  </entry>
   
   <entry>
     <title>初探内核模块</title>
