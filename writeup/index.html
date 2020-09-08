@@ -1,0 +1,51 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>writeup · Mashiroの小站</title><meta name="description" content="[BSidesCF 2020]Had a bad day#先用工具扫一遍，看看有啥文件能用
+
+可用的文件：
+index.php
+flag.php
+
+上边能看出是用category参数来访问不同的文件，初步判断是文件包含，用php://filter协议试一下看看
+
+直接访问index.php发现报错，"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="/images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style-dark.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"><link rel="stylesheet" href="/css/prism.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Typography</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">Sakamoto</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><li><a href="/categories">Categories</a></li><li><a href="/tags">Tags</a></li><li><a href="/categories/index.html">categories</a></li><li><a href="/leetcode/index.html">leetcode</a></li><li><a href="/tags/index.html">tags</a></li><li><a href="/writeup/SUCTF_2018.html">writeup</a></li><li><a href="/writeup/SUCTF_2019.html">writeup</a></li><li><a href="/writeup/index.html" class="current">writeup</a></li><li><a href="/writeup/MRCTF_2020.html">writeup</a></li><li class="soc"><a href="https://github.com/mashiro01" target="_blank" rel="noopener noreferrer"><i class="fa fa-github">&nbsp;</i></a><a href="https://mashiro01.github.io/atom.xml" target="_blank" rel="noopener noreferrer"><i class="fa fa-rss">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2020&nbsp;<a target="_blank" href="https://mashiro01.github.io" rel="noopener noreferrer">Mashiroi</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post-container"><p class="post-title"><a>writeup</a></p><p class="post-meta"><span class="date meta-item">Posted at&nbsp;2020-09-05</span><span class="meta-item"><i class="fa fa-comment-o"></i><span>&nbsp;</span><a href="/writeup/index.html#comments">Comments</a></span></p><p class="post-abstract"><h2><span id="bsidescf-2020-had-a-bad-day">[BSidesCF 2020]Had a bad day</span><a href="#bsidescf-2020-had-a-bad-day" class="header-anchor">#</a></h2><p>先用工具扫一遍，看看有啥文件能用</p>
+<p><img src="./../images/writeup/[BSidesCF%202020]Had%20a%20bad%20day/1.png" alt="info"></p>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">可用的文件：
+index.php
+flag.php<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><img src="./../images/writeup/[BSidesCF%202020]Had%20a%20bad%20day/2.png" alt="basic"></p>
+<p>上边能看出是用category参数来访问不同的文件，初步判断是文件包含，用<code>php://filter</code>协议试一下看看</p>
+<p><img src="./../images/writeup/[BSidesCF%202020]Had%20a%20bad%20day/3.png" alt="error"></p>
+<p>直接访问index.php发现报错，再看文件名，后边多了一小节，去掉读文件，base64解码</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php">&lt;?php
+$file &#x3D; $_GET[&#39;category&#39;];
+
+if(isset($file))
+&#123;
+    if( strpos( $file, &quot;woofers&quot; ) !&#x3D;&#x3D;  false || st( $file, &quot;meowers&quot;) !&#x3D;&#x3D;  false || strpos( $file, &quot;index&quot;)) &#123;
+	    include ($file . &#39;.php&#39;);
+    &#125;
+	else&#123;
+		echo &quot;Sorry, we currently only support woofand meowers.&quot;;
+	&#125;
+&#125;
+?&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到是判断是否存在指定字符来读的文件，那么直接访问<code>flag.php</code>肯定不行，用已知字符绕一下就可了</p>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">woofers&#x2F;..&#x2F;flag<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h2><span id="bsidescf-2019-pick-tac-toe">[BSidesCF 2019]Pick Tac Toe</span><a href="#bsidescf-2019-pick-tac-toe" class="header-anchor">#</a></h2><p>进去看到是个井字棋游戏，post过去数据有点延迟，点快点就行了。。。</p>
+<h2><span id="bsidescf-2019-kookie">[BSidesCF 2019]Kookie</span><a href="#bsidescf-2019-kookie" class="header-anchor">#</a></h2><blockquote>
+<p>一看标题就与cookie有关</p>
+</blockquote>
+<p>进去题目给了个已知账户</p>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">We found the account cookie &#x2F; monster<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>登进去看下cookie，果然有<code>username</code>项的cookie，直接改成admin横向越权，拿到flag</p>
+<h2><span id="bsidescf-2019-futurella">[BSidesCF 2019]Futurella</span><a href="#bsidescf-2019-futurella" class="header-anchor">#</a></h2><p>进去看到火星文图片，这玩意肯定是css整出来的，直接查看源码就可</p>
+</p></div><a id="comments"></a><div id="disqus_thread"></div><script>var disqus_shortname = 'mashiro01';
+var disqus_identifier = 'writeup/index.html';
+var disqus_title = 'writeup';
+var disqus_url = 'https://mashiro01.github.io/writeup/index.html';
+(function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//mashiro01.disqus.com/count.js" async></script></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2020&nbsp;<a target="_blank" href="https://mashiro01.github.io" rel="noopener noreferrer">Mashiroi</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>

